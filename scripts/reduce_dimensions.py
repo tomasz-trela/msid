@@ -11,11 +11,8 @@ def reduce_dimensions_pca(df, pallete):
     categorical = df.select_dtypes(include=['object']).columns
 
     encoder = LabelEncoder()
-
     for name in categorical:
         encoded_df[name] = encoder.fit_transform(df[name])
-
-
 
     scaler = StandardScaler()
     df_scaled = scaler.fit_transform(encoded_df)
