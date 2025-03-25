@@ -3,6 +3,10 @@
 
 ### Prerequisites
 Ensure you have [Conda](https://docs.conda.io/en/latest/) installed on your system.
+Download [data](https://archive.ics.uci.edu/dataset/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition) and put file in project at path.
+```bash
+/data/obesity_data.csv
+```
 
 ### Setting Up the Environment
 Run the following commands to set up the project:
