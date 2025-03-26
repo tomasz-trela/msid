@@ -13,13 +13,10 @@ Run the following commands to set up the project:
 
 ```bash
 # Create a new Conda environment
-conda create --name msid python=3.12.0
+conda env create -f environment.yml
 
 # Activate the environment
 conda activate msid
-
-# Install dependencies from requirements.txt
-pip install -r requirements.txt
 ```
 
 ## Usage
