@@ -1,6 +1,11 @@
 # MSID
 ## Installation
 
+### Clone repository
+```bash
+git clone https://github.com/tomasz-trela/msid.git
+```
+
 ### Prerequisites
 Ensure you have [Conda](https://docs.conda.io/en/latest/) installed on your system.
 Download [data](https://archive.ics.uci.edu/dataset/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition) and put file in project at path.
