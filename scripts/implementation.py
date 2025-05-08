@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder ,RobustScaler
 from sklearn.compose import ColumnTransformer
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 from fetch_data import fetch_obesity_data
@@ -45,7 +46,7 @@ if __name__ == "__main__":
         # ('classifier', DecisionTreeClassifier())
         # ('classifier', LogisticRegression())
         # ('classifier', LinearRegressionClosedForm())
-        # ('classifier', LinearRegression())
+        # ('classifier', SVC(kernel='rbf', C=1.0, probability=True))
         ('classifier', LogisticRegressionGD())
     ])
 
