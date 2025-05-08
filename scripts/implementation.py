@@ -14,41 +14,43 @@ import numpy as np
 
 from logistic_regression import LogisticRegressionGD
 
-df = fetch_obesity_data()
+if __name__ == "__main__":
 
-label_encoder = LabelEncoder()
-y = label_encoder.fit_transform(df['NObeyesdad'])
-X = df.drop(columns=['NObeyesdad'])
+    df = fetch_obesity_data()
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    label_encoder = LabelEncoder()
+    y = label_encoder.fit_transform(df['NObeyesdad'])
+    X = df.drop(columns=['NObeyesdad'])
 
-numeric_columns = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
-ordinal_columns = ["CAEC", "CALC"]
-binary_columns = ["Gender", "family_history_with_overweight", "FAVC", "SMOKE", "SCC"]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-ordinal_labels = [
-    ["no", "Sometimes", "Frequently", "Always"],  # CAEC
-    ["no", "Sometimes", "Frequently", "Always"]   # CALC
-]
+    numeric_columns = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
+    ordinal_columns = ["CAEC", "CALC"]
+    binary_columns = ["Gender", "family_history_with_overweight", "FAVC", "SMOKE", "SCC"]
 
-transformer = ColumnTransformer(transformers=[
-    ('binary', OrdinalEncoder(), binary_columns),
-    ('ordinal', OrdinalEncoder(categories=ordinal_labels), ordinal_columns),
-    ('cat', OneHotEncoder(), ['MTRANS']),
-])
+    ordinal_labels = [
+        ["no", "Sometimes", "Frequently", "Always"],  # CAEC
+        ["no", "Sometimes", "Frequently", "Always"]   # CALC
+    ]
 
-clf = Pipeline([
-    ('preprocessing', transformer),
-    ('scaler', RobustScaler()),
-    # ('classifier', DecisionTreeClassifier())
-    # ('classifier', LogisticRegression())
-    # ('classifier', LinearRegressionClosedForm())
-    # ('classifier', LinearRegression())
-    ('classifier', LogisticRegressionGD())
-])
+    transformer = ColumnTransformer(transformers=[
+        ('binary', OrdinalEncoder(), binary_columns),
+        ('ordinal', OrdinalEncoder(categories=ordinal_labels), ordinal_columns),
+        ('cat', OneHotEncoder(), ['MTRANS']),
+    ])
 
-clf.fit(X_train, y_train)
+    clf = Pipeline([
+        ('preprocessing', transformer),
+        ('scaler', RobustScaler()),
+        # ('classifier', DecisionTreeClassifier())
+        # ('classifier', LogisticRegression())
+        # ('classifier', LinearRegressionClosedForm())
+        # ('classifier', LinearRegression())
+        ('classifier', LogisticRegressionGD())
+    ])
 
-y_pred = clf.predict(X_test)
+    clf.fit(X_train, y_train)
 
-print("Accuracy:", accuracy_score(y_test, y_pred))
+    y_pred = clf.predict(X_test)
+
+    print("Accuracy:", accuracy_score(y_test, y_pred))
