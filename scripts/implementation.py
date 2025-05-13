@@ -13,7 +13,7 @@ from fetch_data import fetch_obesity_data
 from linear_regression import LinearRegressionClosedForm
 import numpy as np
 
-from logistic_regression import LogisticRegressionGD
+from logistic_regression import LogisticRegressionOVR, MyLogisticRegression
 
 if __name__ == "__main__":
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         # ('classifier', LogisticRegression())
         # ('classifier', LinearRegressionClosedForm())
         # ('classifier', SVC(kernel='rbf', C=1.0, probability=True))
-        ('classifier', LogisticRegressionGD())
+        ('classifier', MyLogisticRegression())
     ])
 
     clf.fit(X_train, y_train)

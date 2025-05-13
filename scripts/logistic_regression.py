@@ -1,56 +1,53 @@
 import numpy as np
 
-class LogisticRegressionGD:
-    def __init__(self, learning_rate=0.01, epochs=100, batch_size=32):
-        self.learning_rate = learning_rate
-        self.epochs = epochs
-        self.batch_size = batch_size
+import numpy as np
+
+class MyLogisticRegression:
+    def __init__(self, learning_rate=0.1, n_iters=1000, lambda_=0.01):
+        self.lr = learning_rate
+        self.n_iters = n_iters
+        self.lambda_ = lambda_
         self.weights = None
         self.bias = None
 
-    def sigmoid(self, z):
-        return 1 / (1 + np.exp(-z))
-    
+    def _softmax(self, z):
+        exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
+        return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+
+    def _one_hot(self, y, num_classes):
+        one_hot = np.zeros((y.size, num_classes))
+        one_hot[np.arange(y.size), y] = 1
+        return one_hot
+
     def compute_loss(self, y_true, y_pred):
-        m = len(y_true)
-        loss = - (1/m) * np.sum(y_true*np.log(y_pred + 1e-15) + (1 - y_true)*np.log(1 - y_pred + 1e-15))
+
+        epsilon = 1e-9
+        loss = -np.mean(np.sum(y_true * np.log(y_pred + epsilon), axis=1))
+
+        loss += self.lambda_ * np.sum(self.weights ** 2) / 2
         return loss
 
     def fit(self, X, y):
         n_samples, n_features = X.shape
-        self.weights = np.zeros(n_features)
-        self.bias = 0
+        n_classes = np.max(y) + 1
 
-        for epoch in range(self.epochs):
-            indices = np.arange(n_samples)
-            np.random.shuffle(indices)
+        self.weights = np.zeros((n_features, n_classes))
+        self.bias = np.zeros((1, n_classes))
 
-            X_shuffled = X[indices]
-            y_shuffled = y[indices]
-            
-            for start_idx in range(0, n_samples, self.batch_size):
-                end_idx = start_idx + self.batch_size
-                X_batch = X_shuffled[start_idx:end_idx]
-                y_batch = y_shuffled[start_idx:end_idx]
-                
-                linear_output = np.dot(X_batch, self.weights) + self.bias
-                y_predicted = self.sigmoid(linear_output)
+        y_one_hot = self._one_hot(y, n_classes)
 
-                error = y_predicted - y_batch
-                dw = (1/len(y_batch)) * np.dot(X_batch.T, error)
-                db = (1/len(y_batch)) * np.sum(error)
+        for _ in range(self.n_iters):
+            logits = np.dot(X, self.weights) + self.bias
+            y_pred = self._softmax(logits)
 
-                self.weights -= self.learning_rate * dw
-                self.bias -= self.learning_rate * db
+            error = y_pred - y_one_hot
+            dw = (np.dot(X.T, error) / n_samples) + self.lambda_ * self.weights
+            db = np.mean(error, axis=0, keepdims=True)
 
-            if epoch % 10 == 0:
-                loss = self.compute_loss(y, self.sigmoid(np.dot(X, self.weights) + self.bias))
-                print(f"Epoch {epoch}: Loss = {loss:.4f}")
-
-    def predict_proba(self, X):
-        linear_output = np.dot(X, self.weights) + self.bias
-        return self.sigmoid(linear_output)
+            self.weights -= self.lr * dw
+            self.bias -= self.lr * db
 
     def predict(self, X):
-        proba = self.predict_proba(X)
-        return (proba >= 0.5).astype(int)
+        logits = np.dot(X, self.weights) + self.bias
+        probs = self._softmax(logits)
+        return np.argmax(probs, axis=1)
