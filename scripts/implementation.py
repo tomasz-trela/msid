@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV, StratifiedKFold, train_test_split
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.pipeline import Pipeline
@@ -125,6 +126,13 @@ if __name__ == "__main__":
         'criterion': ['gini', 'entropy']
     }
 
-    cross_validate_model(X, y, DecisionTreeClassifier(random_state=42), transformer,
-                         sampling='smote', param_grid=tree_param_grid)
+    rf_param_grid = {
+        'n_estimators': [100, 200, 50],
+        'max_depth': [10, 20, None],
+        'min_samples_split': [2, 5, 10],
+        'class_weight': ['balanced', None]
+    }
+
+    cross_validate_model(X, y, RandomForestClassifier(random_state=42), transformer,
+       sampling='smote', param_grid=rf_param_grid)
     # train_and_plot(X, y, MyLogisticRegression, transformer)
