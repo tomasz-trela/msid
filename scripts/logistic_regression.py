@@ -1,7 +1,5 @@
 import numpy as np
 
-import numpy as np
-
 class MyLogisticRegression:
     def __init__(self, learning_rate=0.1, n_iters=1000, lambda_=0.01):
         self.lr = learning_rate
@@ -9,6 +7,8 @@ class MyLogisticRegression:
         self.lambda_ = lambda_
         self.weights = None
         self.bias = None
+        self.train_losses = []
+        self.test_losses = []
 
     def _softmax(self, z):
         exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
@@ -20,14 +20,12 @@ class MyLogisticRegression:
         return one_hot
 
     def compute_loss(self, y_true, y_pred):
-
         epsilon = 1e-9
         loss = -np.mean(np.sum(y_true * np.log(y_pred + epsilon), axis=1))
-
         loss += self.lambda_ * np.sum(self.weights ** 2) / 2
         return loss
 
-    def fit(self, X, y):
+    def fit(self, X, y, X_val=None, y_val=None):
         n_samples, n_features = X.shape
         n_classes = np.max(y) + 1
 
@@ -39,13 +37,19 @@ class MyLogisticRegression:
         for _ in range(self.n_iters):
             logits = np.dot(X, self.weights) + self.bias
             y_pred = self._softmax(logits)
-
             error = y_pred - y_one_hot
             dw = (np.dot(X.T, error) / n_samples) + self.lambda_ * self.weights
             db = np.mean(error, axis=0, keepdims=True)
 
             self.weights -= self.lr * dw
             self.bias -= self.lr * db
+
+            if X_val is not None and y_val is not None:
+                y_train_pred = self._softmax(np.dot(X, self.weights) + self.bias)
+                y_val_pred = self._softmax(np.dot(X_val, self.weights) + self.bias)
+                self.train_losses.append(self.compute_loss(y_one_hot, y_train_pred))
+                y_val_one_hot = self._one_hot(y_val, n_classes)
+                self.test_losses.append(self.compute_loss(y_val_one_hot, y_val_pred))
 
     def predict(self, X):
         logits = np.dot(X, self.weights) + self.bias
